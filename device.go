@@ -3,10 +3,8 @@ package max7219
 import (
 	"fmt"
 
-	"golang.org/x/text/encoding"
-
-	//"github.com/fulr/spidev"
 	"github.com/alinke/spidev"
+	"golang.org/x/text/encoding"
 )
 
 // General interface of ASCII char set bit pattern
