@@ -5,10 +5,11 @@ Source forked from https://github.com/adrianh-za/go-max7219-rpi which was forked
 
 ## Enhancements ##
 
-* Works with pre-assembled 4 and 8 module MAX7219 LED module matrices.
-* Set the rotational direction of the MAX7219 LED modules.
-    * Some of the pre-assembled 4 and 8 LED modules are connected "upsidedown" to the circuit board.  Using the <i>inverted</i> rotational directions allows for supporting of these MAX7219 4 and 8 module LED module matrices.
-* Sliding of text with blank padding before and after text.
+* Works with pre-assembled 4 and 8 module MAX7219 LED module matrices. - Adrianh
+* Set the rotational direction of the MAX7219 LED modules. - Adrianh
+    * Some of the pre-assembled 4 and 8 LED modules are connected "upsidedown" to the circuit board.  Using the <i>inverted</i> rotational directions allows for supporting of these MAX7219 4 and 8 module LED module matrices. - Adrianh
+* Sliding of text with blank padding before and after text. - Adrianh
+* Debugging console output turned off
 
 ## Usage ##
 
@@ -30,11 +31,11 @@ Examples filenames
 
 ## Compatibility ##
 
-Tested on Raspberry PI 3 B+, Orange Pi Zero 2 (use SPI 1), and Orange Pi Zero 3 (use SPI 1)
+Tested on Raspberry PI 3 B+, Orange Pi Zero 2 (use SPI device 1), and Orange Pi Zero 3 (use SPI device 1)
 
 ## Acknowledgements ##
 
-Thanks to <a href="https://github.com/d2r2" target="blank"><b>Denis Dyakov</b></a> for his excellent libraries
+Thanks to <a href="https://github.com/d2r2" target="blank"><b>Denis Dyakov</b></a> for his excellent libraries and to Adrianh for adding multi-module support
 
 ## Gits ##
 
