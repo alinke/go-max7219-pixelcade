@@ -12,8 +12,8 @@ Source forked from https://github.com/adrianh-za/go-max7219-rpi which was forked
 
 ## Usage ##
 
-1) go get [github.com/adrianh-za/go-max7219](https://github.com/alinke/go-max7219-pixelcade)
-2) browse to $/go/src/github.com/alinke/go-max7219-pixelcade/examples
+1) go get [https://github.com/alinke/go-max7219-pixelcade](https://github.com/alinke/go-max7219-pixelcade)
+2) browse to [$/go/src/github.com/alinke/go-max7219-pixelcade/examples](https://github.com/alinke/go-max7219-pixelcade/tree/master/examples)
 3) sudo -E go run [filename].go
 4) run to end (or ctrl-c to quit)
 
