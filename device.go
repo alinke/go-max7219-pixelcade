@@ -3,7 +3,7 @@ package max7219
 import (
 	"fmt"
 
-	"github.com/alinke/spidev"
+	"github.com/fulr/spidev"
 	"golang.org/x/text/encoding"
 )
 
