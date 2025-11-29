@@ -291,6 +291,113 @@ func (this *Matrix) SlideMessage(text string, font Font, condensePattern bool, p
 	return nil
 }
 
+// SlideMessageWithCancel shows message sliding from right to left with cancellation support.
+// Pass a channel that will be closed when you want to cancel the scroll.
+// Returns true if cancelled, false if completed normally.
+func (this *Matrix) SlideMessageWithCancel(text string, font Font, condensePattern bool, pixelDelay time.Duration, cancel <-chan struct{}) (cancelled bool) {
+
+	// No rotation configured, do normal scrolling
+	if (this.Rotation == RotateNone) {
+
+		b := convertUnicodeToAscii(text, font.GetCodePage())
+		buffer := preparePatterns(b, font.GetLetterPatterns(), condensePattern)
+
+		for _, b := range buffer {
+			// Check for cancellation
+			select {
+			case <-cancel:
+				return true
+			default:
+			}
+
+			time.Sleep(pixelDelay)
+			err := this.Device.ScrollLeft(true)
+			if err != nil {
+				return false
+			}
+			err = this.Device.SetBufferLine(
+				this.Device.GetCascadeCount()-1,
+				this.Device.GetLedLineCount()-1, b, true)
+			if err != nil {
+				return false
+			}
+		}
+
+	// Rotation configured, do "special" scrolling
+	} else {
+
+		b := convertUnicodeToAscii(text, font.GetCodePage())
+		buffer := preparePatterns(b, font.GetLetterPatterns(), condensePattern)
+
+		// Add empty chars onto start of buffer so it can start sliding "off-screen" (8 bytes per LED module)
+		buffer = append(make([]byte, this.Device.GetCascadeCount() * 8), buffer...)
+
+		//Start sliding
+		var shiftCount = 0
+		for {
+			// Check for cancellation
+			select {
+			case <-cancel:
+				return true
+			default:
+			}
+
+			this.Device.Flush()
+
+			// End of buffer reached
+			if shiftCount > len(buffer) {
+				break
+			}
+
+			// Build up the buffers to be displayed
+			var shiftBuffer = append(buffer[shiftCount:])		// Shift the buffer 1 vertical line of LEDs to left
+			var paddingBuffer = make([]byte, shiftCount + 1)	// Add empty char onto end of buffer so it can continue sliding "off-screen"
+			shiftBuffer = append(shiftBuffer, paddingBuffer...) // Concatenate the 2 buffers
+
+			// Rotate the letters in the buffer
+			var rotatedBuffer = rotateCharacters(shiftBuffer, this.Rotation)
+
+			// Set the start LED block (cascade)
+			var cascadeCount = 0
+			if (this.Rotation == RotateAntiClockwise) || (this.Rotation == RotateAntiClockwiseInvert) {
+				cascadeCount = this.Device.GetCascadeCount() - 1
+			}
+
+			// Render each LED line accross all the LED blocks (cascades)
+			for lineCount, byteValue := range rotatedBuffer {
+				err := this.Device.SetBufferLine(
+					cascadeCount,
+					(lineCount % 8),
+					byteValue,
+					true)
+				if err != nil {
+					return false
+				}
+
+				// Move onto next LED block (cascade)
+				if (lineCount % 8 == 7) {
+					if (this.Rotation == RotateClockwise) || (this.Rotation == RotateClockwiseInvert) {
+						cascadeCount++
+					} else if (this.Rotation == RotateAntiClockwise) || (this.Rotation == RotateAntiClockwiseInvert){
+						cascadeCount--
+					}
+				}
+
+				// All LED lines for all LED blocks (cascades) rendered, we can break
+				if (lineCount == (this.Device.GetCascadeCount() * this.Device.GetLedLineCount()) - 1) {
+					break
+				}
+			}
+
+			// Delay for the specified time
+			time.Sleep(pixelDelay)
+			shiftCount++;
+		}
+	}
+
+	return false
+}
+
 // Rotate the set of characters based on the Rotation specified, ultimately calls rotateCharacter()
 func rotateCharacters(character []byte, rotate Rotation) ([]byte) {
 	var totalCharacters = len(character) / 8
